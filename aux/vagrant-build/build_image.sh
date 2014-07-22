@@ -9,6 +9,21 @@ export branch=${4:-master}
 export ovirt_node_tools_gittag=${5:-master}
 export WITH_GIT_BRANCH=${6:-master}
 
+# enable EPEL
+if [[ -f /etc/redhat-release ]]; then
+  _PKG=$(rpm -qa '(redhat|sl|centos|oraclelinux)-release(|-server|-workstation|-client|-computenode)')
+  OS_VERSION=$(rpm -q --queryformat '%{VERSION}' $_PKG | grep -o '^[0-9]*')
+  if [[ OS_VERSION = "7" ]]; then
+    EPEL_REL="7-0.2"
+    yum -y install http://dl.fedoraproject.org/pub/epel/beta/7/x86_64/epel-release-$EPEL_REL.noarch.rpm
+  elif [[ OS_VERSION = "6" ]]; then
+    EPEL_REL="6-8"
+    rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-$EPEL_REL.noarch.rpm
+  else
+    echo "Unknown RHEL version"
+  fi
+fi
+
 # give the VM some time to finish booting and network configuration
 while ! ping -c1 -w5 8.8.8.8 &>/dev/null; do true; done
 yum -y install livecd-tools appliance-tools-minimizer fedora-packager \
