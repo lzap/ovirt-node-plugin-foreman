@@ -10,7 +10,7 @@ export ovirt_node_tools_gittag=${5:-master}
 export WITH_GIT_BRANCH=${6:-master}
 
 # give the VM some time to finish booting and network configuration
-sleep 30
+while ! ping -c1 -w5 8.8.8.8 &>/dev/null; do true; done
 yum -y install livecd-tools appliance-tools-minimizer fedora-packager \
   python-devel rpm-build createrepo selinux-policy-doc checkpolicy \
   selinux-policy-devel autoconf automake python-mock python-lockfile \
